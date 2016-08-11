@@ -1,0 +1,5 @@
+---
+# defaults file for historian
+#
+# Postgres version
+pg_version: '95'

@@ -1,0 +1,14 @@
+---
+# set variables for postgres 94 
+pg_packages: 
+  - postgresql94
+  - postgresql94-contrib
+  - postgresql94-devel
+  - postgresql94-libs
+  - postgresql94-server
+  - python-psycopg2
+
+pg_version: "94"
+pg_home: "/var/lib/pgsql/9.4"
+pg_service: "postgresql-9.4"
+pg_bin: "/usr/pgsql-9.4/bin"

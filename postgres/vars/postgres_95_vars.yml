@@ -1,0 +1,15 @@
+---
+# postgres 95 variables
+pg_packages: 
+  - postgresql95
+  - postgresql95-contrib
+  - postgresql95-devel
+  - postgresql95-libs
+  - postgresql95-server
+  - slony1-95
+  - python-psycopg2
+
+pg_version: "95"
+pg_home: "/var/lib/pgsql/9.5"
+pg_service: "postgresql-9.5"
+pg_bin: "/usr/pgsql-9.5/bin"

@@ -1,0 +1,58 @@
+---
+
+- include_vars: ../vars/postgres_94_vars.yml
+  when: pg_version == "94"
+
+- include_vars: ../vars/postgres_95_vars.yml
+  when: pg_version == "95"
+
+#Configure postgres 
+- name: Install postgres
+  yum: name={{ item }} state=present
+  with_list: "{{ pg_packages }}"
+
+#Perform DB initiliaztion check
+- name: Verify if a DB initialize is required
+  stat: path={{ pg_home }}/data/base
+  register: dynac_db_dir
+
+#Initialize database 
+- name: Initialize the database
+  shell: "{{ pg_bin }}/initdb -D {{ pg_home }}/data/ -U postgres"
+  become: yes
+  become_user: postgres
+  register: db_initialized
+  when: dynac_db_dir.stat.exists == false 
+
+#Create any extra tables space and config directory structure
+- name: Create tablespace and config directory structure
+  file: path={{ item }} state=directory owner=postgres group=postgres
+  with_list:
+    - '/var/lib/pgsql/scripts'
+    - "{{ pg_home }}/data/conf.d"
+
+- name: Secure the postgres conf.d directory
+  file: path={{ item }} state=directory owner=postgres group=postgres mode=0700
+  with_list:
+    - "{{ pg_home }}/data/conf.d"
+
+
+#Copy configuration files
+- name: Copy postgresql.conf
+  template: src=postgresql.conf dest={{ pg_home }}/data/postgresql.conf mode=0600 owner=postgres group=postgres
+  notify: restart postgres
+
+- name: Copy pg_hba.conf
+  copy: src=pg_hba.conf dest={{ pg_home }}/data/conf.d/pg_hba.hba mode=0600 owner=postgres group=postgres
+  notify: restart postgres
+
+
+#Services
+- name: Enable and start postgres service
+  service: name={{ pg_service }} state=started enabled=yes
+
+#Configure postgres users
+#This should probably be an encrypted variable
+- name: Set password on postgres user
+  postgresql_user: name=postgres password='SUPERSECRETSQUIRELSTUFF'
+
