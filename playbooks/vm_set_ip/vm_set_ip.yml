@@ -1,0 +1,28 @@
+---
+- hosts: localhost
+  vars:
+    vcenter: "vcenter.host.com"
+    user: "admin"
+    passwd: "password"
+    cluster: "cluster_name"
+    guest: "vm_name"
+    guest_ip: "NONE"
+  tasks:
+    - name: Get facts for existing VM
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter }}"
+        username: "{{ user }}"
+        password: "{{ passwd }}"
+        guest: "{{ guest }}"
+        vmware_guest_facts: yes
+    - debug: msg=IP Address of VM is {{ hw_eth0.ipaddresses[0] }}
+    - name: Add the IP address of the VM to the  
+      add_host: name={{ hw_eth0.ipaddresses[0] }} groups=new_hosts
+      register: inv_out
+
+- hosts: new_hosts 
+  tasks:
+    - name: Do stuff on the new host
+      shell: hostname
+      register: the_output
+    - debug: msg={{ the_output }}
