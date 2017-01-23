@@ -8,6 +8,7 @@
     guest: "vm_name"
     guest_ip: "NONE"
   tasks:
+    #Pull back the IP Address assigned to first network interface of host
     - name: Get facts for existing VM
       vsphere_guest:
         vcenter_hostname: "{{ vcenter }}"
@@ -16,10 +17,12 @@
         guest: "{{ guest }}"
         vmware_guest_facts: yes
     - debug: msg=IP Address of VM is {{ hw_eth0.ipaddresses[0] }}
-    - name: Add the IP address of the VM to the  
+    #Add IP address of the vm that you just looked up to in memory inventory
+    - name: Add the IP address of the VM to the in memory inventory.
       add_host: name={{ hw_eth0.ipaddresses[0] }} groups=new_hosts
       register: inv_out
-
+#Now that you have registered the IP Address of the target vm as a host in the inventory you can do anything ansible to it you wish.
+#This includes changing the IP Address. :)
 - hosts: new_hosts 
   tasks:
     - name: Do stuff on the new host
